@@ -1,0 +1,59 @@
+import java.util.Scanner;
+
+public class Shape {
+    
+    // Volume methods (Overloading)
+    double volume(double l, double b, double h) {
+        return l * b * h;
+    }
+
+    double volume(double r) {
+        return (4.0 / 3) * Math.PI * r * r * r;
+    }
+
+    double volume(double r, double h) {
+        return Math.PI * r * r * h;
+    }
+
+    // Surface Area methods
+    double area(double l, double b, double h) {
+        return 2 * (l*b + l*h + b*h);
+    }
+
+    double area(double r) {
+        return 4 * Math.PI * r * r;
+    }
+
+    double area(double r, double h) {
+        return 2 * Math.PI * r * (r + h);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Shape obj = new Shape();
+
+        // Parallelepiped
+        System.out.println("Enter length, breadth, height:");
+        double l = sc.nextDouble();
+        double b = sc.nextDouble();
+        double h = sc.nextDouble();
+
+        System.out.println("Volume = " + obj.volume(l, b, h));
+        System.out.println("Surface Area = " + obj.area(l, b, h));
+
+        // Sphere
+        System.out.println("\nEnter radius:");
+        double r = sc.nextDouble();
+
+        System.out.println("Volume = " + obj.volume(r));
+        System.out.println("Surface Area = " + obj.area(r));
+
+        // Cylinder
+        System.out.println("\nEnter radius and height:");
+        double r2 = sc.nextDouble();
+        double h2 = sc.nextDouble();
+
+        System.out.println("Volume = " + obj.volume(r2, h2));
+        System.out.println("Surface Area = " + obj.area(r2, h2));
+    }
+}
