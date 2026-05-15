@@ -1,0 +1,92 @@
+interface A {
+    void methodA1();
+    void methodA2();
+}
+
+interface B {
+    void methodB1();
+    void methodB2();
+}
+
+interface C {
+    void methodC1();
+    void methodC2();
+}
+
+// New interface inheriting A, B, C
+interface D extends A, B, C {
+    void methodD();
+}
+
+// Concrete class
+class BaseClass {
+    void baseMethod() {
+        System.out.println("Base class method");
+    }
+}
+
+// Implementing class
+class MyClass extends BaseClass implements D {
+
+    public void methodA1() {
+        System.out.println("Method A1");
+    }
+
+    public void methodA2() {
+        System.out.println("Method A2");
+    }
+
+    public void methodB1() {
+        System.out.println("Method B1");
+    }
+
+    public void methodB2() {
+        System.out.println("Method B2");
+    }
+
+    public void methodC1() {
+        System.out.println("Method C1");
+    }
+
+    public void methodC2() {
+        System.out.println("Method C2");
+    }
+
+    public void methodD() {
+        System.out.println("Method D");
+    }
+}
+
+public class Main {
+
+    static void takeA(A obj) {
+        obj.methodA1();
+        obj.methodA2();
+    }
+
+    static void takeB(B obj) {
+        obj.methodB1();
+        obj.methodB2();
+    }
+
+    static void takeC(C obj) {
+        obj.methodC1();
+        obj.methodC2();
+    }
+
+    static void takeD(D obj) {
+        obj.methodD();
+    }
+
+    public static void main(String[] args) {
+
+        MyClass obj = new MyClass();
+
+        takeA(obj);
+        takeB(obj);
+        takeC(obj);
+        takeD(obj);
+
+        obj.baseMethod();
+    }
+}
