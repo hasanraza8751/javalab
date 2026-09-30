@@ -1,0 +1,206 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = pd.read_csv("student_marks_logistic.csv")
+
+X = data["Marks_in_Semester"].values
+y_original = data["y"].values
+
+y = np.where(y_original == 1, 1, 0)
+
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
+def hypothesis(X, w, b):
+    z = w * X + b
+    return sigmoid(z)
+
+
+def cost_function(X, y, w, b):
+    m = len(y)
+
+    y_pred = hypothesis(X, w, b)
+
+    epsilon = 1e-10
+
+    y_pred = np.clip(
+        y_pred,
+        epsilon,
+        1 - epsilon
+    )
+
+    cost = -(1 / m) * np.sum(
+        y * np.log(y_pred)
+        + (1 - y) * np.log(1 - y_pred)
+    )
+
+    return cost
+
+
+def gradient_descent(
+    X,
+    y,
+    learning_rate=0.001,
+    epochs=10000
+):
+
+    w = 0.0
+    b = 0.0
+
+    m = len(y)
+
+    for epoch in range(epochs):
+
+        y_pred = hypothesis(X, w, b)
+
+        dw = (1 / m) * np.sum(
+            (y_pred - y) * X
+        )
+
+        db = (1 / m) * np.sum(
+            y_pred - y
+        )
+
+        w = w - learning_rate * dw
+        b = b - learning_rate * db
+
+    return w, b
+
+
+def logistic_regression(X, y):
+    w, b = gradient_descent(
+        X,
+        y,
+        learning_rate=0.001,
+        epochs=10000
+    )
+
+    return w, b
+
+
+w, b = logistic_regression(X, y)
+
+print("Weight (w):", w)
+print("Bias (b):", b)
+
+
+probabilities = hypothesis(X, w, b)
+
+predictions = np.where(
+    probabilities >= 0.5,
+    1,
+    0
+)
+
+
+print("\nTraining Results")
+print("-------------------------")
+
+for i in range(len(X)):
+
+    result = "Pass" if predictions[i] == 1 else "Fail"
+
+    print(
+        "Marks:",
+        X[i],
+        "Probability:",
+        round(probabilities[i], 4),
+        "Prediction:",
+        result
+    )
+
+
+cost = cost_function(X, y, w, b)
+
+print("\nFinal Cost:", cost)
+
+
+marks = 20
+
+probability = hypothesis(
+    np.array([marks]),
+    w,
+    b
+)[0]
+
+prediction = 1 if probability >= 0.5 else 0
+
+
+print("\nPrediction for 20 Marks")
+print("-------------------------")
+print("Probability of Passing:", probability)
+
+if prediction == 1:
+    print("Result: PASS")
+else:
+    print("Result: FAIL")
+
+
+# Plot
+
+X_plot = np.linspace(
+    min(X) - 2,
+    max(X) + 2,
+    200
+)
+
+Y_plot = hypothesis(
+    X_plot,
+    w,
+    b
+)
+
+plt.figure(figsize=(8, 6))
+
+plt.scatter(
+    X[y == 0],
+    y[y == 0],
+    marker='o',
+    label='Fail'
+)
+
+plt.scatter(
+    X[y == 1],
+    y[y == 1],
+    marker='o',
+    label='Pass'
+)
+
+plt.plot(
+    X_plot,
+    Y_plot,
+    label='Sigmoid Curve'
+)
+
+plt.axhline(
+    y=0.5,
+    linestyle='--',
+    label='Decision Threshold = 0.5'
+)
+
+plt.scatter(
+    marks,
+    probability,
+    marker='*',
+    s=200,
+    label='Prediction for 20 Marks'
+)
+
+plt.axvline(
+    x=marks,
+    linestyle='--',
+    linewidth=1
+)
+
+plt.xlabel("Marks in Semester")
+plt.ylabel("Probability of Passing")
+
+plt.title("Logistic Regression")
+
+plt.legend()
+plt.grid(True)
+
+plt.show()
