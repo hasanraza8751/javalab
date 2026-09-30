@@ -1,0 +1,113 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = pd.read_csv("student_marks.csv")
+
+print("Student Marks Data:")
+print(data)
+
+# Independent variable (X)
+X = data["Class_Test_Marks"].values
+
+# Dependent variable (Y)
+Y = data["Semester_Marks"].values
+
+mean_X = np.mean(X)
+mean_Y = np.mean(Y)
+
+print("\nMean of Class Test Marks:", mean_X)
+print("Mean of Semester Marks:", mean_Y)
+
+
+numerator = np.sum((X - mean_X) * (Y - mean_Y))
+denominator = np.sum((X - mean_X) ** 2)
+
+m = numerator / denominator
+
+
+c = mean_Y - (m * mean_X)
+
+print("\nSlope (m):", m)
+print("Intercept (c):", c)
+
+
+Y_pred = m * X + c
+
+print("\nActual and Predicted Semester Marks:")
+result = pd.DataFrame({
+    "Class_Test_Marks": X,
+    "Actual_Semester_Marks": Y,
+    "Predicted_Semester_Marks": Y_pred
+})
+
+print(result)
+
+
+class_test_mark = 20
+
+predicted_mark = m * class_test_mark + c
+
+print("\nPredicted Semester Marks for Class Test = 20:")
+print(predicted_mark)
+
+
+
+MAE = np.mean(np.abs(Y - Y_pred))
+
+
+
+MSE = np.mean((Y - Y_pred) ** 2)
+
+
+
+RMSE = np.sqrt(MSE)
+
+
+
+SS_res = np.sum((Y - Y_pred) ** 2)
+SS_tot = np.sum((Y - mean_Y) ** 2)
+
+R2 = 1 - (SS_res / SS_tot)
+
+
+
+print("\nLoss Functions / Evaluation Metrics:")
+print("MAE  :", MAE)
+print("MSE  :", MSE)
+print("RMSE :", RMSE)
+print("R²   :", R2)
+
+
+
+plt.figure(figsize=(8, 6))
+
+# Actual data points
+plt.scatter(X,Y,marker='o',label='Actual Data')
+
+# Regression line
+# Sort X values so that the line is drawn properly
+X_line = np.linspace(min(X), max(X), 100)
+Y_line = m * X_line + c
+
+plt.plot(X_line,Y_line,label='Regression Line')
+
+# Predicted point for X = 20
+plt.scatter(class_test_mark,predicted_mark,marker='*',s=200,label='Prediction for X = 20')
+
+# Draw vertical and horizontal guide lines
+plt.axvline(x=class_test_mark,linestyle='--',linewidth=1)
+
+plt.axhline(y=predicted_mark,linestyle='--',linewidth=1)
+
+# Labels and title
+plt.xlabel("Marks in Class Test")
+plt.ylabel("Marks in Semester Examination")
+
+plt.title("Linear Regression: Class Test Marks vs Semester Marks")
+
+plt.legend()
+plt.grid(True)
+
+# Display graph
+plt.show()
