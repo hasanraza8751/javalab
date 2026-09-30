@@ -1,0 +1,154 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+X = np.array([
+    [1, 2],
+    [2, 2],
+    [2, 3],
+    [8, 7],
+    [8, 8],
+    [25, 80]
+])
+
+points = ["A", "B", "C", "D", "E", "F"]
+
+eps = 2
+min_pts = 2
+
+def euclidean_distance(p1, p2):
+    return np.sqrt(
+        (p1[0] - p2[0]) ** 2 +
+        (p1[1] - p2[1]) ** 2
+    )
+
+
+def get_neighbors(X, point_index, eps):
+
+    neighbors = []
+
+    for i in range(len(X)):
+
+        distance = euclidean_distance(
+            X[point_index],
+            X[i]
+        )
+
+        if distance <= eps:
+            neighbors.append(i)
+
+    return neighbors
+
+
+def dbscan(X, eps, min_pts):
+
+    labels = np.full(len(X), -1)
+
+    visited = np.zeros(len(X), dtype=bool)
+
+    cluster_id = 0
+
+    for i in range(len(X)):
+
+        if visited[i]:
+            continue
+
+        visited[i] = True
+
+        neighbors = get_neighbors(X, i, eps)
+
+        if len(neighbors) < min_pts:
+            labels[i] = -1
+            continue
+
+        labels[i] = cluster_id
+
+        seeds = neighbors.copy()
+
+        j = 0
+
+        while j < len(seeds):
+
+            current = seeds[j]
+
+            if not visited[current]:
+
+                visited[current] = True
+
+                current_neighbors = get_neighbors(
+                    X,
+                    current,
+                    eps
+                )
+
+                if len(current_neighbors) >= min_pts:
+
+                    for neighbor in current_neighbors:
+                        if neighbor not in seeds:
+                            seeds.append(neighbor)
+
+            if labels[current] == -1:
+                labels[current] = cluster_id
+
+            j += 1
+
+        cluster_id += 1
+
+    return labels
+
+
+labels = dbscan(X, eps, min_pts)
+
+print("DBSCAN Results")
+print("----------------")
+
+for i in range(len(X)):
+
+    if labels[i] == -1:
+        result = "Noise"
+    else:
+        result = "Cluster " + str(labels[i] + 1)
+
+    print(points[i], "->", result)
+
+
+plt.figure(figsize=(8, 6))
+
+clusters = set(labels)
+
+for cluster in clusters:
+
+    if cluster == -1:
+        cluster_points = X[labels == cluster]
+
+        plt.scatter(
+            cluster_points[:, 0],
+            cluster_points[:, 1],
+            marker="x",
+            s=100,
+            label="Noise"
+        )
+
+    else:
+        cluster_points = X[labels == cluster]
+
+        plt.scatter(
+            cluster_points[:, 0],
+            cluster_points[:, 1],
+            s=100,
+            label="Cluster " + str(cluster + 1)
+        )
+
+for i, point in enumerate(points):
+    plt.annotate(
+        point,
+        (X[i][0], X[i][1]),
+        xytext=(5, 5),
+        textcoords="offset points"
+    )
+
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("DBSCAN Clustering")
+plt.legend()
+plt.grid(True)
+plt.show()
